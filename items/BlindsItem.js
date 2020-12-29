@@ -121,7 +121,7 @@ BlindsItem.prototype.setItem = function(value, callback) {
     } else {
         //reverse again the value
         //add or subtract the aberration to ManualPosition
-        //Loxone won't let you set the same number as ManualPosition action a second time (ManualPosition/100 -> wait -> FullUp  - wait -> ManualPosition/100 won't work)
+        //Loxone won't let you set the same number as ManualPosition action a second time (ManualPosition/100 -> wait -> FullUp -> wait -> ManualPosition/100 won't work)
         //Loxone will cast to something usefull - i guess it is a bug in Loxone
         if(value < 100) {
             var newPosition = 100 - value + aberration; // will generate 100.0[001something] for example and results in completely closed
