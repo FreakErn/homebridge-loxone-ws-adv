@@ -114,14 +114,24 @@ BlindsItem.prototype.setItem = function(value, callback) {
     this.startedPosition = this.currentPosition;
     this.targetPosition = parseInt(value);
 
+    let aberration = Math.floor(Math.random() * 1000000000) / 1000000000000; // generate a 0.00[random] number as aberration
     let command = 0;
     if (typeof value === 'boolean') {
         command = value ? 'FullUp' : 'FullDown';
     } else {
         //reverse again the value
-        command = `ManualPosition/${100 - value}`;
+        //add or subtract the aberration to ManualPosition
+        //Loxone won't let you set the same number as ManualPosition action a second time (ManualPosition/100 -> wait -> FullUp  - wait -> ManualPosition/100 won't work)
+        //Loxone will cast to something usefull - i guess it is a bug in Loxone
+        if(value < 100) {
+            var newPosition = 100 - value + aberration; // will generate 100.00[001something] for example and results in completely closed
+        } else {
+            var newPosition = 0 - aberration; // will generate -0.00[999something] for example and results in completely open
+        }
+        command = `ManualPosition/${newPosition}` ;
     }
-    this.log(`[blinds] iOS - send message to ${this.name}: ${command}`);
+    this.log(`[blinds] iOS - send message to ${this.name}: ManualPosition/${100 - value}`);
+    this.log.debug(`actually send ${newPosition}`);
     this.platform.ws.sendCommand(this.uuidAction, command);
     callback();
 
